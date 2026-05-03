@@ -1,0 +1,3 @@
+interface Renderable{
+  void render();
+}
