@@ -11,13 +11,15 @@ class Juego implements Renderable{
   EstadoJuego estado;
   int puntaje = 0;
   int tickRate;
+  int auxTickRate;
   int tiempoUpdate = 0;
   
   double tiempoComienzoJuego = -1;
   double tiempoFinalJuego = -1;
   double tiempoTotalJuego = -1;
   
-  InputProvider input;
+  InputProvider inputK;
+  InputProvider inputA;
   
   //Render
   int tamCelda;
@@ -31,8 +33,11 @@ class Juego implements Renderable{
   PGraphics fondoPausa;
   PImage imgPausa;
   
+  //Sonido
+  SoundProvider sonido;
+  
   //Constructor
-  Juego(int ancho, int alto, int tickRate, InputProvider input){
+  Juego(int ancho, int alto, int tickRate, InputProvider inputK, InputProvider inputA, SoundProvider sonido){
     tamCelda = width / ancho - 50;
     offsetX = (width - tamCelda * ancho) / 2;
     offsetY = (height - tamCelda * alto) / 2;
@@ -42,8 +47,10 @@ class Juego implements Renderable{
     
     this.estado = EstadoJuego.INICIO;
     this.tickRate = tickRate;
+    this.auxTickRate = tickRate;
     
-    this.input = input;
+    this.inputK = inputK;
+    this.inputA = inputA;
     
     //Render
     fontTitulos = createFont("Sofia-Regular.ttf", 48);
@@ -67,21 +74,31 @@ class Juego implements Renderable{
     }
     fondoPausa.endDraw();
     imgPausa = loadImage("cabeza.png");
+    
+    //Sonido
+    this.sonido = sonido;
   };
   
   //Flujo Logica Juego
   void update(){
+    /*
     Posicion cabeza = serpiente.obtenerCabeza();
     println("pos Serpiente" + "[x: " + cabeza.x + ", y: " + cabeza.y + "]");
     println(estado);
+    */
+    
     if(millis() >= tiempoUpdate){
-      
       switch(estado){
         case INICIO:
           inicioJuego();
           break;
         case JUGANDO:
           jugando();
+          if( inputA.aceleracionJuego() ){
+            tickRate = 450;
+          } else{
+            tickRate = auxTickRate;
+          }
           break;
         case FINALIZADO:
           gameOver();
@@ -97,7 +114,7 @@ class Juego implements Renderable{
   
   void inicioJuego(){
     //Esperar INPUT
-    if(input.inicioSolicitado()){
+    if(inputK.inicioSolicitado()){
       puntaje = 0;
         serpiente.reset(tablero);
         estado = EstadoJuego.JUGANDO;
@@ -108,8 +125,8 @@ class Juego implements Renderable{
   }
   void jugando(){
     //leer Input
-    serpiente.cambiarDireccion(input.obtenerDireccion());
-     
+    serpiente.cambiarDireccion(inputA.obtenerDireccion());
+    serpiente.cambiarDireccion(inputK.obtenerDireccion());
     //mover serpiente
     serpiente.mover();
     //obtener cabeza
@@ -129,6 +146,8 @@ class Juego implements Renderable{
       serpiente.crecer();
       //Actualizar Puntaje
       puntaje++;
+      //Sonido Comer
+      sonido.comer(puntaje);
     }
   }
   void gameOver(){
@@ -174,7 +193,7 @@ class Juego implements Renderable{
          textAlign(CENTER, CENTER);
          fill(#FFFFFF);
          text("Pausar Juego", xBoton, yBoton, anchoBoton, altoBoton);
-         if(input.mouseEnBoton(xBoton, yBoton, anchoBoton, altoBoton)){
+         if(inputK.mouseEnBoton(xBoton, yBoton, anchoBoton, altoBoton)){
              estado = EstadoJuego.PAUSADO;
          };
          
@@ -208,7 +227,7 @@ class Juego implements Renderable{
            textAlign(CENTER, CENTER);
            text("GAME_OVER", width/2, height/4);
          }
-         if(input.mouseEnBoton(xBotonFinalizado, yBotonFinalizado, anchoBotonFinalizado, altoBotonFinalizado)){
+         if(inputK.mouseEnBoton(xBotonFinalizado, yBotonFinalizado, anchoBotonFinalizado, altoBotonFinalizado)){
              estado = EstadoJuego.INICIO;
              bandera = false;
          };
@@ -230,7 +249,7 @@ class Juego implements Renderable{
            text("Despausar Juego", xBotonPausa, yBotonPausa, anchoBotonPausa, altoBotonPausa);
            text("Puntos: " + puntaje, xBotonPausa, yBotonPausa/4, anchoBotonPausa, altoBotonPausa);
          }
-         if(input.mouseEnBoton(xBotonPausa, yBotonPausa, anchoBotonPausa, altoBotonPausa)){
+         if(inputK.mouseEnBoton(xBotonPausa, yBotonPausa, anchoBotonPausa, altoBotonPausa)){
              estado = EstadoJuego.JUGANDO;
              bandera = false;
          };
@@ -241,6 +260,30 @@ class Juego implements Renderable{
          
          break;
     };
-
+  }
+  
+  EstadoJuego estadoAnterior;
+  void sonido(){
+    sonido.update();
+    if (estado != estadoAnterior) {
+      switch(estado){
+        case INICIO:
+          sonido.inicio();
+          break;
+  
+        case JUGANDO:
+          sonido.resume();
+          break;
+  
+        case FINALIZADO:
+          sonido.muerte(); 
+          break;
+  
+        case PAUSADO:
+          sonido.pausa();
+          break;
+      }
+    estadoAnterior = estado;
+    }
   }
 }

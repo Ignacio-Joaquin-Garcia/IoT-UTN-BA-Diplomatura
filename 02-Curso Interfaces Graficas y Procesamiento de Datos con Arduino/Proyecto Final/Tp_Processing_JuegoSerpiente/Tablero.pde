@@ -24,7 +24,6 @@ class Tablero implements Renderable{
   void render(){
     noStroke();
     fill(#65366C);
-    println(ancho * tamCelda);
     rect(0, 0, ancho * tamCelda, alto * tamCelda, 5);
     fill(#E4CCE8);
     for(int i = 0; i < alto; i++){
