@@ -1,0 +1,72 @@
+*{
+    box-sizing: border-box;
+    margin: 0rem;
+    padding: 0rem;
+}
+
+
+img{
+    width: 1.7rem;
+    object-fit: cover;
+}
+.mini-icon{
+    width: 1.35rem;
+}
+
+/*
+PALETA DE COLORES
+Cards: #B8B68F
+Cards: #EBE6D2
+#DBD3C6
+#DECCA6
+Fondo: #D0C0A7
+*/
+
+body{
+    background-color: #D0C0A7;
+    padding: 0.5rem;
+    margin: 0.25rem;
+}
+header{
+    background-color: #B8B68F;
+    border-radius: 1rem;
+    border: 2px solid #DECCA6;
+}
+footer{
+    background-color: #B8B68F;
+    border-radius: 1rem;
+    border: 2px solid #DECCA6;
+}
+header h1{
+    font-size: 32px;
+    font-weight: bold;
+    font-style: italic;
+}
+main{
+    height: 100vh;
+}
+.info p{
+    font-size: 12px;
+}
+.info img{
+    width: 1.25rem;
+}
+.device{
+    background-color: #EBE6D2;
+    border-radius: 0.75rem;
+    border: 2px solid #DECCA6;
+    
+}
+.device h3{
+    font-size: 24px;
+}
+.config-card{
+    background-color: #DBD3C6;
+    border-radius: 2rem;
+    border: 2px solid #DECCA6;
+}
+.devices-card{
+    background-color: #decca69c;
+    border-radius: 2rem;
+    border: 4px solid #DECCA6;
+}
